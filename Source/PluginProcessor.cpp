@@ -166,7 +166,8 @@ bool EQEQnoMiAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* EQEQnoMiAudioProcessor::createEditor()
 {
-    return new EQEQnoMiAudioProcessorEditor (*this);
+    //return new EQEQnoMiAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -182,6 +183,122 @@ void EQEQnoMiAudioProcessor::setStateInformation (const void* data, int sizeInBy
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
+
+
+//<ano_2
+
+juce::AudioProcessorValueTreeState::ParameterLayout
+    EQEQnoMiAudioProcessor::createParameterLayout(){
+        
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "LowCut",
+                "LowCut",
+                juce::NormalisableRange<float>(20.f,20000.f, 1.f, 1.f),
+                20.f
+            ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "HighCut",
+                "HighCut",
+                juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+                20000.f
+                ));
+
+            //Parametric Band 1 - PB_1
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_1_freq",
+                "PB_1_freq",
+                juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+                250.f
+                ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_1_gain",
+                "PB_1_gain",
+                juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
+                0.0f
+                ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_1_q",
+                "PB_1_q",
+                juce::NormalisableRange<float>(0.1f, 10.f, 0.5f, 1.f),
+                1.f
+                ));
+
+            //Parametric Band 2 - PB_2
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_2_freq",
+                "PB_2_freq",
+                juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+                1000.f
+                ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_2_gain",
+                "PB_2_gain",
+                juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
+                0.0f
+                ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_2_q", 
+                "PB_2_q",
+                juce::NormalisableRange<float>(0.1f, 10.f, 0.5f, 1.f),
+                1.f
+                ));
+
+            //Parametric Band 3 - PB_3
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_3_freq",
+                "PB_3_freq",
+                juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+                2500.f
+                ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_3_gain",
+                "PB_3_gain",
+                juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
+                0.0f
+                ));
+
+            layout.add(std::make_unique<juce::AudioParameterFloat>(
+                "PB_3_q",
+                "PB_3_q",
+                juce::NormalisableRange<float>(0.1f, 10.f, 0.5f, 1.f),
+                1.f
+                ));
+
+        juce::StringArray stringArray;
+        for (int i = 0; i < 4; ++i) {
+            juce::String str;
+            str << (12 + 12*i);
+            str << "db/oct";
+            stringArray.add(str);
+        }
+
+            layout.add(std::make_unique<juce::AudioParameterChoice>(
+                "LowCut Slope",
+                "LowCut Slope",
+                stringArray,
+                0
+            ));
+            layout.add(std::make_unique<juce::AudioParameterChoice>(
+                "HighCut Slope",
+                "HighCut Slope",
+                stringArray,
+                0
+            ));
+
+        return layout;
+
+    }
+
+//ano_2>
+
 
 //==============================================================================
 // This creates new instances of the plugin..
