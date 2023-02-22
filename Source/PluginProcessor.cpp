@@ -95,6 +95,19 @@ void EQEQnoMiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    //<ano_4
+    
+    juce::dsp::ProcessSpec spec;
+    
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels      = 1;
+    spec.sampleRate       = sampleRate;
+
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
+
+    //ano_4>
 }
 
 void EQEQnoMiAudioProcessor::releaseResources()
@@ -144,7 +157,7 @@ void EQEQnoMiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
+    /* This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
     // the samples and the outer loop is handling the channels.
@@ -156,6 +169,25 @@ void EQEQnoMiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
         // ..do something to the data...
     }
+    */
+
+    //<ano_5
+        
+    juce::dsp::AudioBlock<float> block(buffer);
+
+    //blocks representing individual channels
+    auto leftBlock  = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
+
+    //context providing wrapper around the block that the chain can use
+    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+
+    //passing context to the mono filter chain
+    leftChain.process(leftContext);
+    rightChain.process(rightContext);
+
+    //ano_5>
 }
 
 //==============================================================================
@@ -217,14 +249,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout
             layout.add(std::make_unique<juce::AudioParameterFloat>(
                 "PB_1_gain",
                 "PB_1_gain",
-                juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
+                juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f),
                 0.0f
                 ));
 
             layout.add(std::make_unique<juce::AudioParameterFloat>(
                 "PB_1_q",
                 "PB_1_q",
-                juce::NormalisableRange<float>(0.1f, 10.f, 0.5f, 1.f),
+                juce::NormalisableRange<float>(0.0f, 10.f, 0.1f, 1.f),
                 1.f
                 ));
 
@@ -239,14 +271,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout
             layout.add(std::make_unique<juce::AudioParameterFloat>(
                 "PB_2_gain",
                 "PB_2_gain",
-                juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
+                juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f),
                 0.0f
                 ));
 
             layout.add(std::make_unique<juce::AudioParameterFloat>(
                 "PB_2_q", 
                 "PB_2_q",
-                juce::NormalisableRange<float>(0.1f, 10.f, 0.5f, 1.f),
+                juce::NormalisableRange<float>(0.0f, 10.f, 0.1f, 1.f),
                 1.f
                 ));
 
@@ -261,14 +293,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout
             layout.add(std::make_unique<juce::AudioParameterFloat>(
                 "PB_3_gain",
                 "PB_3_gain",
-                juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
+                juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f),
                 0.0f
                 ));
 
             layout.add(std::make_unique<juce::AudioParameterFloat>(
                 "PB_3_q",
                 "PB_3_q",
-                juce::NormalisableRange<float>(0.1f, 10.f, 0.5f, 1.f),
+                juce::NormalisableRange<float>(0.0f, 10.f, 0.1f, 1.f),
                 1.f
                 ));
 
@@ -294,7 +326,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout
             ));
 
         return layout;
-
     }
 
 //ano_2>

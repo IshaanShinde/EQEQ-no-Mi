@@ -73,6 +73,24 @@ public:
 
 
 private:
+
+    //<ano_3
+        
+    using Filter = juce::dsp::IIR::Filter<float>;
+
+    //low and high cut 4 step filter (db/oct)
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+
+    //signal path <lowcut, pb1, pb2, pb3, highcut>
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter,
+                                                Filter, Filter, Filter,
+                                                CutFilter>;
+
+    MonoChain leftChain, rightChain;
+
+
+    //ano_3>
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQEQnoMiAudioProcessor)
 };
